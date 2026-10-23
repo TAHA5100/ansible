@@ -1,0 +1,24 @@
+---
+- name: Install NGINX
+  apt:
+    name: nginx
+    state: present
+
+- name: Ensure web root exists
+  file:
+    path: "{{ web_root }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: Deploy landing page
+  template:
+    src: index.html.j2
+    dest: "{{ web_root }}/index.html"
+
+- name: Ensure NGINX service is running
+  service:
+    name: nginx
+    state: started
+    enabled: true
