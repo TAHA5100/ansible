@@ -1,0 +1,21 @@
+---
+- name: Create backup directory
+  file:
+    path: "{{ backup_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Create backup script
+  copy:
+    dest: /usr/local/sbin/backup.sh
+    mode: '0755'
+    content: |
+      #!/bin/bash
+      tar -czf {{ backup_dir }}/system-backup-$(date +%F-%H%M%S).tar.gz /etc /var/www 2>/dev/null
+
+- name: Add backup cron job
+  cron:
+    name: "System backup"
+    minute: "0"
+    hour: "2"
+    job: "/usr/local/sbin/backup.sh >> /var/log/backup.log 2>&1"
