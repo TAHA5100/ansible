@@ -1,0 +1,31 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Upgrade system packages
+  apt:
+    upgrade: safe
+
+- name: Install base packages
+  apt:
+    name:
+      - curl
+      - git
+      - unzip
+      - htop
+      - net-tools
+      - rsync
+      - cron
+      - tree
+      - jq
+    state: present
+
+- name: Set timezone
+  timezone:
+    name: "{{ timezone }}"
+
+- name: Set hostname
+  hostname:
+    name: "{{ hostname }}"
