@@ -1,79 +1,66 @@
-# Ansible
+# Ansible Linux Automation
 
-A practical Ansible project for automating essential Linux system administration tasks, enforcing security baselines, and managing core infrastructure in a repeatable and maintainable way.
+A practical Ansible project for automating essential Linux server tasks, hardening SSH access, configuring a firewall, creating scheduled backups, and deploying a simple web service.
 
-This project is designed to demonstrate skills in:
-- Linux system administration
-- Server hardening
-- Automation with Ansible
-- Firewall and networking basics
-- Backup and maintenance tasks
-- Infrastructure as Code
-- Service deployment and validation
+This repository is designed to demonstrate real-world infrastructure automation skills using Infrastructure as Code (IaC) principles.
 
 ## Project Goal
 
-This project automates a typical Linux server setup used in real environments:
-- update and maintain system packages
-- create and manage users
-- secure SSH access
-- configure firewall rules
-- monitor basic server health
-- schedule automatic backups
-- deploy a simple web service
-- keep the environment repeatable and easy to manage
+This project automates a basic Linux server setup by:
+- updating and maintaining system packages
+- configuring the base system
+- hardening SSH access
+- enabling firewall rules
+- creating automated backups
+- deploying a basic NGINX landing page
 
 ## Why This Project Matters
 
-This is a strong portfolio project because it reflects real operational responsibilities in IT and infrastructure roles:
-- keeping systems consistent and secure
-- reducing manual tasks
-- automating routine admin work
-- making server configuration version-controlled
-- improving reliability and accountability
+This project reflects common responsibilities in Linux system administration and DevOps:
+- keeping systems consistent and repeatable
+- reducing manual server setup work
+- improving security posture
+- documenting infrastructure changes in version control
+- automating routine maintenance tasks
 
 ## Repository Structure
 
 ```text
-linux-automation/
+ansible/
 ├── README.md
-├── ansible.cfg
 ├── playbook.yml
+├── start.sh
 ├── inventory/
 │   └── local.yml
-├── group_vars/
-│   └── all.yml
 ├── roles/
 │   ├── base/
-│   │   └── tasks/main.yml
-│   ├── users/
-│   │   └── tasks/main.yml
-│   ├── ssh/
-│   │   └── tasks/main.yml
+│   │   └── tasks/
+│   │       └── main.yml
+│   ├── sshd/
+│   │   └── tasks/
+│   │       └── main.yml
 │   ├── firewall/
-│   │   └── tasks/main.yml
+│   │   └── tasks/
+│   │       └── main.yml
 │   ├── backup/
-│   │   └── tasks/main.yml
-│   ├── monitoring/
-│   │   └── tasks/main.yml
+│   │   └── tasks/
+│   │       └── main.yml
 │   └── web/
-│       ├── tasks/main.yml
-│       └── templates/index.html.j2
-├── scripts/
-│   └── backup.sh
-├── .gitignore
-├── .ansible-lint
-└── .github/
-    └── workflows/ansible-lint.yml
+│       ├── tasks/
+│       │   └── main.yml
+│       └── templates/
+│           └── index.html.j2
+└──
 ```
+
 ## Prerequisites
 
-- Ubuntu or Debian Linux server
+- Ubuntu or Debian-based Linux machine
 - Ansible installed on the control machine
-- SSH access to target hosts
-- sudo privileges on remote machines
+- SSH access to the target host
+- sudo privileges on the remote server
 - SSH key-based authentication configured
-- Python
+- Python installed on the target host
 
 Install Ansible:
 
@@ -87,11 +74,11 @@ sudo apt install ansible -y
 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-user/linux-automation.git
-cd linux-automation
+git clone https://github.com/TAHA5100/ansible.git
+cd ansible
 ```
 
-2. Update the inventory
+2. Update the inventory file
 
 ```yaml
 all:
@@ -134,41 +121,48 @@ free -h
   become: true
   roles:
     - base
-    - users
-    - ssh
+    - sshd
     - firewall
-    - monitoring
     - backup
     - web
 ```
 
-## Included Tasks
+## Included Roles
 
-### Base configuration
-- system update
-- package installation
-- hostname and timezone configuration
+### Base role
+Performs the initial system setup:
+- update package cache
+- upgrade installed packages
+- install base utilities such as curl, git, jq, htop, rsync, cron, and tree
+- configure timezone
+- set hostname
 
-### User and access control
-- create non-root admin users
-- configure sudo access
-- secure SSH authentication
+### SSHD role
+Hardens SSH access:
+- disables password authentication
+- disables root SSH login
+- enables public key authentication
+- restarts the SSH service
 
-### Security
-- disable password login
-- disable root SSH access
-- configure firewall rules
+### Firewall role
+Configures the server firewall:
+- installs UFW
+- allows SSH traffic
+- allows HTTP traffic on port 80
+- enables UFW with a default deny policy
 
-### Backup and monitoring
-- create backup folders
-- schedule automatic backups
-- check disk and memory usage
-- validate service status
+### Backup role
+Creates automated backup functionality:
+- creates a backup directory
+- writes a backup script
+- schedules a cron job to run nightly backups
 
-### Web deployment
-- install NGINX
-- deploy a custom landing page
-- ensure the service is running
+### Web role
+Deploys a simple web server:
+- installs NGINX
+- creates the web root
+- deploys a landing page using a template
+- ensures the NGINX service is running
 
 ## Validation
 
@@ -179,3 +173,21 @@ ansible-playbook --syntax-check playbook.yml
 ansible-playbook -i inventory/local.yml playbook.yml --check
 ansible-playbook -i inventory/local.yml playbook.yml
 ```
+
+## Useful Notes
+
+- This repository is intentionally focused on a simple Linux server baseline.
+- The role structure is modular and easy to extend.
+- You can add more roles later for monitoring, Docker, Kubernetes, log collection, or application deployment.
+- The project is suitable as a learning project, portfolio project, or foundation for a larger Ansible setup.
+
+## Future Improvements
+
+Potential upgrades for this project include:
+- adding a monitoring role
+- using `group_vars` for centralized configuration
+- separating inventory into `dev` and `prod`
+- adding `ansible.cfg` for standard configuration
+- adding linting and CI checks for better automation quality
+
+This project is a solid beginner-to-intermediate Ansible setup that demonstrates infrastructure automation, security hardening, and deployment fundamentals in a practical way.
